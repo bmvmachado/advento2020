@@ -1,5 +1,4 @@
-from helperFunctions import intTryParse
-from helperFunctions import validYear
+from helperFunctions import intTryParse,validYear,validEyeColor,validPassport,validHeight,validHairColor
 
 BirthYearDef ="byr" 
 IssueYearDef = "iyr"
@@ -9,6 +8,7 @@ HairColorDef = "hcl"
 EyeColorDef = "ecl"
 PassportIdDef = "pid"
 CountryIdDef = "cid"
+
 
 class Passport:
     def __init__(self, details = []):
@@ -58,5 +58,5 @@ class Passport:
     def print(self):
         print(f"BirthYear: {self.BirthYear} IssueYear: {self.IssueYear} ExpirationYear: {self.ExpirationYear} Height: {self.Height} HairColor: {self.HairColor} EyeColor: {self.EyeColor} PassportID: {self.PassportID} CountryID: {self.CountryID}")
     
-    def wrong(self):
-        return not validYear(self.BirthYear,self.BirthYearDef,1920,2002) or not validYear(self.IssueYear,self.IssueYearDef,2010,2020)  or not validYear(self.ExpirationYear,self.ExpirationYearDef,2020,2030) or self.Height == HeightDef or self.HairColor == HairColorDef or self.EyeColor == EyeColorDef or self.PassportID == PassportIdDef #or self.CountryID == self.CountryIdDef
+    def valid(self):
+        return validYear(self.BirthYear,self.BirthYearDef,1920,2002) and validYear(self.IssueYear,self.IssueYearDef,2010,2020)  and validYear(self.ExpirationYear,self.ExpirationYearDef,2020,2030)  and validEyeColor(self.EyeColor,EyeColorDef) and validPassport(self.PassportID,PassportIdDef) and validHeight(self.Height , HeightDef) and validHairColor(self.HairColor,HairColorDef)

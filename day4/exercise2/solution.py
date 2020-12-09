@@ -14,7 +14,7 @@ for currentPass in lines:
 		
 		passportDetails = []
 
-		if not p1.wrong() :
+		if p1.valid() :
 			valid += 1;
 	else :
 		passportDetails.append(currentPass)
@@ -24,7 +24,7 @@ if len(passportDetails)>0:
 	p1 = Passport(passportDetails)
 	passportStorage.append(p1)
 
-	if not p1.wrong() :
+	if p1.valid() :
 		valid += 1;
 
 print(len(passportDetails))
