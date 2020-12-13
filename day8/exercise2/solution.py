@@ -1,48 +1,80 @@
-from bagRule import BagRule
+import os
+from codeInstruction import CodeInstruction
 
-def nrOfBags(currentBag, listOfBags ):
-	count = 0;
-	for rule in currentBag.BagRules:	
-		print(f"rule {rule} currentBag {currentBag.print()}")
+def executeProgram(codeInstructionsBag, instNumberToAnalyse, alreadyChangedIndexes):
+	accumulatorValue = 0;
+	index = 0
+	currentExecution = codeInstructionsBag[index]
+	newInstruction = False
+	breakExecution = False
+	errorExecution = True
 
-		existentRules = [x for x in listOfBags if x.MainBag == rule] 
-		if len(existentRules) > 0 :
-			res = nrOfBags(existentRules[0],bagRules)
-			count = count + currentBag.BagRules[rule] + currentBag.BagRules[rule]*res
-
-	return count
- 
-
+	for b in codeInstructionsBag:
+		b.NumberExecutions = 0
 
 
-f = open("..\input.txt", "r")
+	while not breakExecution:
+		instructionCode = currentExecution.InstructionCode
+		if instNumberToAnalyse == currentExecution.Number :		
+			if instructionCode == "jmp" :
+				instructionCode = "nop"
+			else :
+				instructionCode = "jmp"
+			
+
+		if instructionCode == "acc" :
+			accumulatorValue = accumulatorValue + currentExecution.Value
+			index = index + 1
+		elif instructionCode == "jmp" :
+			index = index + currentExecution.Value
+			if not newInstruction and instNumberToAnalyse != currentExecution.Number and currentExecution.Number not in alreadyChangedIndexes :
+				instNumberToAnalyse = currentExecution.Number
+				newInstruction = True
+		elif instructionCode == "nop" :
+			index = index + 1
+			if not newInstruction and instNumberToAnalyse != currentExecution.Number  and currentExecution.Number not in alreadyChangedIndexes:
+				instNumberToAnalyse = currentExecution.Number
+				newInstruction = True
+		
+		if index >= len(codeInstructionsBag) :
+			breakExecution = True
+			errorExecution = False
+		else :		
+			currentExecution.NumberExecutions = 1				
+			currentExecution.print()
+			currentExecution = codeInstructionsBag[index]
+			breakExecution = currentExecution.NumberExecutions > 0	
+			print(breakExecution)
+
+
+	return (accumulatorValue , instNumberToAnalyse, errorExecution) ;
+
+
+
+print(os.getcwd())
+f = open("advento2020/day8/input.txt", "r")
 lines = f.readlines()
 
-bagRules = []
 
-searchBag = "shiny gold"
-shinyGoldBagRule = {}
+codeInstructionsBag = []
+number = 1;
 for current in lines:
-	bagRule = BagRule(current)
-	bagRules.append(bagRule)
-	if bagRule.MainBag == searchBag :
-		shinyGoldBagRule = bagRule
-
-
-
-shinyGoldBagRule.print()
-nrOcurrrences = 0
-nrDistinct = 0
-for rule in shinyGoldBagRule.BagRules :	
-	print(f"rule '{rule}' shinyGoldBagRule : {shinyGoldBagRule.BagRules[rule]}")
-	existentRules = [x for x in bagRules if x.MainBag == rule] 
-	if len(existentRules) > 0 :
-		res = nrOfBags(existentRules[0],bagRules)
-		nrOcurrrences = nrOcurrrences + shinyGoldBagRule.BagRules[rule] + shinyGoldBagRule.BagRules[rule]*res
-		if res > 0 :
-			nrDistinct = nrDistinct +1
-
+	codeInstruction = CodeInstruction(current, number)
+	codeInstructionsBag.append(codeInstruction)
+	number = number + 1
+	codeInstruction.print()
 	
-print(nrOcurrrences)
-print(nrDistinct)
-print(len(bagRules))
+alreadyChangedIndexes = []
+result = executeProgram(codeInstructionsBag,-1,alreadyChangedIndexes )
+index = result[1]
+while result[2] :	
+	result = executeProgram(codeInstructionsBag,index, alreadyChangedIndexes)
+	alreadyChangedIndexes.append(index)
+	if result[1] == index :
+		index = result[1] + 1
+	else :
+		index = result[1]
+
+
+print(result)
+print(len(codeInstructionsBag))

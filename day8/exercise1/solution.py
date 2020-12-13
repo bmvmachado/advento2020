@@ -1,41 +1,38 @@
-from bagRule import BagRule
+def executeProgram(codeInstructionsBag):
+	accumulatorValue = 0;
+	index = 0
 
-def canCarryBag(searchBag , currentBag, listOfBags ):
-	nrOccurrences = 0;
-	for current in currentBag.BagRules:	
-		print(f"searchBag '{searchBag}' current '{current}' currentBag.MainBag '{currentBag.MainBag}'")
-		if searchBag == current :		
-			print(f"current {current} currentBag.MainBag {currentBag.MainBag}")
-			nrOccurrences = nrOccurrences + 1
-		else :
-			existentRules = [x for x in listOfBags if x.MainBag == current] 
-			if len(existentRules) > 0 :
-				nrOccurrences = nrOccurrences + canCarryBag(searchBag ,existentRules[0],listOfBags)
+	currentExecution = codeInstructionsBag[index]
+	
+	while currentExecution.NumberExecutions == 0 :
+		if currentExecution.InstructionCode == "acc" :
+			accumulatorValue = accumulatorValue + currentExecution.Value
+			index = index + 1
+		elif currentExecution.InstructionCode == "jmp" :
+			index = index + currentExecution.Value
+		elif currentExecution.InstructionCode == "nop" :
+			index = index + 1
+		currentExecution.NumberExecutions = 1
+		currentExecution.print()
+		print(accumulatorValue)
+		
+		currentExecution = codeInstructionsBag[index]
 
-	return nrOccurrences
- 
+	return accumulatorValue;
 
 
+from codeInstruction import CodeInstruction
 
 f = open("..\input.txt", "r")
 lines = f.readlines()
 
-bagRules = []
+codeInstructionsBag = []
 
-searchBag = "shiny gold"
 for current in lines:
-	bagRule = BagRule(current)
-	bagRules.append(bagRule)
+	codeInstruction = CodeInstruction(current)
+	codeInstructionsBag.append(codeInstruction)
 
-nrOcurrrences = 0
-nrDistinct = 0
-for rule in bagRules :
-	res = canCarryBag(searchBag ,rule,bagRules)
-	nrOcurrrences = nrOcurrrences + res
-	if res > 0 :
-		nrDistinct = nrDistinct +1
+accumulator = executeProgram(codeInstructionsBag)
 
-	
-print(nrOcurrrences)
-print(nrDistinct)
-print(len(bagRules))
+print(accumulator)
+print(len(codeInstructionsBag))
