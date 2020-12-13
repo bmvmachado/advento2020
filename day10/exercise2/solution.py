@@ -1,48 +1,67 @@
-def existsSumInArray(valueToCompare, values):
-	for firstValue in values :
-		for secondValue in values :
-			if firstValue != secondValue and (firstValue + secondValue) == valueToCompare:
-				return True;
-	return False;
+import itertools
 
-def sumContiguous(valueToCompare, values):
-	setNumbers = []
-	sumValue = 0;
-	for firstValue in values :
-		sumValue = sumValue + firstValue
-		setNumbers.append(firstValue)
-		if sumValue == valueToCompare :
-				return (True,setNumbers)
-	
-	return (False, []);
-				
+def validConfiguration(adapters):
+	index = 1
+	while index < len(adapters) :
+		firstAdapter = adapters[index-1]
+		secondAdapter = adapters[index]
+		difference = secondAdapter - firstAdapter
+		index = index +1
+		if difference > 3 :
+			return False
+	return True;
 
-f = open("advento2020/day9/input.txt", "r")
+def runConfigurations(listOfAdapters,cleanList):	
+	index = 1
+	isValid = validConfiguration(listOfAdapters)
+
+	if listOfAdapters not in cleanList:
+			cleanList.append(listOfAdapters[:])
+		
+
+	while index < len(listOfAdapters)-1:		
+		if 1<= (listOfAdapters[index+1] - listOfAdapters[index-1]) <= 3 : 
+			slicedAdapters = listOfAdapters[:index] + listOfAdapters[index+1 :]			
+			if slicedAdapters not in cleanList:
+				runConfigurations(slicedAdapters, cleanList)
+		index = index +1
+	return
+
+def getAllCombinations(listOfAdapters):	
+	index = 0		
+	listSize = len(listOfAdapters)
+	slicedAdapters = listOfAdapters[:]
+
+	cleanList = []
+
+	while index < listSize:
+		
+		combinationsResult = itertools.combinations(slicedAdapters,len(slicedAdapters)-1)
+		for result in combinationsResult:
+			if result not in cleanList:
+				cleanList.append(result);						 
+		slicedAdapters = listOfAdapters[:index] + listOfAdapters[index+1 :]		
+		index = index +1
+	return cleanList
+
+f = open("advento2020/day10/input.txt", "r")
 lines = f.readlines()
-
-xmasNumbers = []
-notValidNumbers = []
-preamble = 25
+adaptersBag = []
 for current in lines:
 	parsedValue = int(current.strip())
-	if len(xmasNumbers) >= (preamble + 1) and not existsSumInArray(parsedValue,xmasNumbers[len(xmasNumbers)-(preamble + 1):len(xmasNumbers)]):
-		notValidNumbers.append(parsedValue)
 	
-	xmasNumbers.append(parsedValue)	
-		
-print(notValidNumbers)
+	adaptersBag.append(parsedValue)	
 
-valueToCompare = notValidNumbers[0]
+sortedAdapters = sorted(adaptersBag)
+cleanList  = getAllCombinations(sortedAdapters)
 
-index = 0;
-result = {}
-while index < len(xmasNumbers) :
-	result = sumContiguous(valueToCompare,xmasNumbers[index:len(xmasNumbers)])
-	index = index +1
+validCombination = 0;
+for combination in cleanList:
+	if validConfiguration(combination) :
+		validCombination = validCombination +1
 
-	if result[0] :
-		print(sorted(result[1]))
-		break;
+print(cleanList)
+print(cleanList[:5])
+print(len(cleanList))
 
-sortedList = sorted(result[1])
-print (f"{sortedList[0]} + {sortedList[len(sortedList)-1]} = {sortedList[0] + sortedList[len(sortedList)-1]}" )
+print(validCombination)
